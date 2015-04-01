@@ -1,0 +1,14 @@
+NewsLibs/bin/
+NewsLibs/gen/
+NewsLibs/.settings/org.eclipse.jdt.core.prefs
+NewsLibsTest/bin/
+NewsLibsTest/gen/
+google-play-services_lib/bin/
+google-play-services_lib/gen/
+google-play-services_lib/.settings/org.eclipse.jdt.core.prefs
+volley/bin/
+volley/gen/
+volley/.settings/org.eclipse.jdt.core.prefs
+*.iml
+build/
+.DS_Store
