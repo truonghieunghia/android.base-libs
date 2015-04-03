@@ -11,9 +11,11 @@ import java.lang.annotation.Target;
  */
 @Target( ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface JsonObject {
+public @interface JsonAnnotation {
 
     public String FieldName () default "";
 
     public Class< ? > FieldType () default Object.class;
+
+    public boolean isObject() default false;
 }

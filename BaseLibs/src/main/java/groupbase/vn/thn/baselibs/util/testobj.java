@@ -7,7 +7,7 @@ import java.util.ArrayList;
  */
 public class testobj {
 
-    @JsonObject(FieldName = "age", FieldType = ArrayList.class)
+    @JsonAnnotation(FieldName = "age", FieldType = ArrayList.class,isObject = false)
     private int tuoi;
 
     public testobj (  ) {
