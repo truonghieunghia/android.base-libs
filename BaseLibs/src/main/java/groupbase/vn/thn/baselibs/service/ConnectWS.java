@@ -38,7 +38,7 @@ import groupbase.vn.thn.baselibs.util.Parse;
  * Created by nghiath on 4/1/15.
  */
 public class ConnectWS implements Response.Listener<String>,Response.ErrorListener{
-
+    private String TAG = "ConnectWS";
     private ArrayList< Param > mParams;
     private String mKey;
     private RequestCallBack mRequestCallBack;
@@ -49,7 +49,18 @@ public class ConnectWS implements Response.Listener<String>,Response.ErrorListen
     private Object mDataCache = null;
     private RequestQueue mRequestQueue;
     private ArrayList<?> mListResult;
+    private static ConnectWS mInstance;
 
+    public ConnectWS (  Context context ) {
+        this.mContext = context;
+        mRequestQueue = getRequestQueue();
+    }
+    public static synchronized ConnectWS getInstance(Context context) {
+        if (mInstance == null) {
+            mInstance = new ConnectWS(context);
+        }
+        return mInstance;
+    }
     public ConnectWS ( String url, Context context ) {
 
         this.mRequestCallBack = null;
@@ -103,7 +114,7 @@ public class ConnectWS implements Response.Listener<String>,Response.ErrorListen
         createKey();
         RequestJson requestJson = new RequestJson( method,mUrl,this,this );
         requestJson.setShouldCache( false );
-        addToRequestQueue( requestJson,mKey );
+        addToRequestQueue( requestJson, mKey );
     }
 
     public void postRequestNoCache(){
@@ -118,6 +129,15 @@ public class ConnectWS implements Response.Listener<String>,Response.ErrorListen
         requestJson.setShouldCache( false );
         addToRequestQueue( requestJson,mKey );
     }
+    public void start(){
+        stop();
+        mRequestQueue.start();
+    }
+
+    public void stop(){
+        mRequestQueue.stop();
+        mRequestQueue.cancelAll( TAG );
+    }
     private void createKey () {
 
         String key_ext = "";
@@ -130,8 +150,9 @@ public class ConnectWS implements Response.Listener<String>,Response.ErrorListen
         this.mDataCache = getCache();
     }
     private RequestQueue getRequestQueue () {
-
-        mRequestQueue = Volley.newRequestQueue( mContext );
+        if ( mRequestQueue == null ) {
+            mRequestQueue = Volley.newRequestQueue( mContext.getApplicationContext() );
+        }
         return mRequestQueue;
     }
 
@@ -143,7 +164,7 @@ public class ConnectWS implements Response.Listener<String>,Response.ErrorListen
 
     private < T > void addToRequestQueue ( Request< T > req ) {
 
-        req.setTag( "Service Connect" );
+        req.setTag( TAG );
         getRequestQueue().add( req );
     }
 
