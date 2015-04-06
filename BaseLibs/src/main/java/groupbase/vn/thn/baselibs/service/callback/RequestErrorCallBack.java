@@ -9,5 +9,4 @@ public interface RequestErrorCallBack {
 
     public void onError ( VolleyError volleyError );
 
-    public void onException ( Exception e );
 }
