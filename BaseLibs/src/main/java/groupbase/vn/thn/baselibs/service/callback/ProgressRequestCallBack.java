@@ -5,7 +5,7 @@ package groupbase.vn.thn.baselibs.service.callback;
  */
 public interface ProgressRequestCallBack {
 
-    public void onStart();
-    public void doInBackground();
-    public void onComplete();
+    public void onStart(int contentLength);
+    public void onUpdate(int downloadSize);
+    public void onComplete(int totalSize);
 }

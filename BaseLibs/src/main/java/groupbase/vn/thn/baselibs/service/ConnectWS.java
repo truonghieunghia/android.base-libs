@@ -12,7 +12,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -29,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import groupbase.vn.thn.baselibs.service.callback.ProgressRequestCallBack;
 import groupbase.vn.thn.baselibs.service.callback.RequestCallBack;
 import groupbase.vn.thn.baselibs.service.callback.RequestErrorCallBack;
 import groupbase.vn.thn.baselibs.util.Param;
@@ -37,7 +37,8 @@ import groupbase.vn.thn.baselibs.util.Parse;
 /**
  * Created by nghiath on 4/1/15.
  */
-public class ConnectWS implements Response.Listener<String>,Response.ErrorListener{
+public class ConnectWS implements Response.Listener< String >, Response.ErrorListener {
+
     private String TAG = "ConnectWS";
     private ArrayList< Param > mParams;
     private String mKey;
@@ -48,19 +49,24 @@ public class ConnectWS implements Response.Listener<String>,Response.ErrorListen
     private String mUrl;
     private Object mDataCache = null;
     private RequestQueue mRequestQueue;
-    private ArrayList<?> mListResult;
+    private ArrayList< ? > mListResult;
     private static ConnectWS mInstance;
+    private ProgressRequestCallBack mProgressRequestCallBack;
 
-    public ConnectWS (  Context context ) {
+    public ConnectWS ( Context context ) {
+
         this.mContext = context;
         mRequestQueue = getRequestQueue();
     }
-    public static synchronized ConnectWS getInstance(Context context) {
-        if (mInstance == null) {
-            mInstance = new ConnectWS(context);
+
+    public static synchronized ConnectWS getInstance ( Context context ) {
+
+        if ( mInstance == null ) {
+            mInstance = new ConnectWS( context );
         }
         return mInstance;
     }
+
     public ConnectWS ( String url, Context context ) {
 
         this.mRequestCallBack = null;
@@ -70,12 +76,27 @@ public class ConnectWS implements Response.Listener<String>,Response.ErrorListen
         this.mKey = url;
     }
 
+    public ConnectWS ( String url, Context context, ProgressRequestCallBack progressRequestCallBack ) {
+
+        this.mRequestCallBack = null;
+        this.mObjectParser = null;
+        this.mUrl = url;
+        this.mContext = context;
+        this.mKey = url;
+        this.mProgressRequestCallBack = progressRequestCallBack;
+    }
+
     public < T > ConnectWS ( String url, RequestCallBack< T > requestCallBack, Context context ) {
 
         this.mContext = context;
         this.mUrl = url;
         this.mKey = url;
         this.setRequestCallBack( requestCallBack );
+    }
+
+    public void setProgressRequestCallBack ( ProgressRequestCallBack progressRequestCallBack ) {
+
+        this.mProgressRequestCallBack = progressRequestCallBack;
     }
 
     public void setRequestErrorCallBack ( RequestErrorCallBack requestErrorCallBack ) {
@@ -94,50 +115,68 @@ public class ConnectWS implements Response.Listener<String>,Response.ErrorListen
         this.mParams = params;
     }
 
-    public void request(int method){
+    public void request ( int method ) {
+
         createKey();
-        RequestJson requestJson = new RequestJson( method,mUrl,this,this );
-        addToRequestQueue( requestJson,mKey );
+        RequestJson requestJson = new RequestJson( method, mUrl, this, this );
+        addToRequestQueue( requestJson, mKey );
     }
 
-    public void postRequest(){
+    public void postRequest () {
+
         createKey();
-        RequestJson requestJson = new RequestJson( Request.Method.POST,mUrl,this,this );
-        addToRequestQueue( requestJson,mKey );
+        RequestJson requestJson = new RequestJson( Request.Method.POST, mUrl, this, this );
+        addToRequestQueue( requestJson, mKey );
     }
-    public void getRequest(){
-        createKey();
-        RequestJson requestJson = new RequestJson( Request.Method.GET,mUrl,this,this );
-        addToRequestQueue( requestJson,mKey );
+
+    public void onError ( VolleyError volleyError ) {
+
+        mRequestErrorCallBack.onError( volleyError );
     }
-    public void requestNoCache(int method){
+
+    public void getRequest () {
+
         createKey();
-        RequestJson requestJson = new RequestJson( method,mUrl,this,this );
+        RequestJson requestJson = new RequestJson( Request.Method.GET, mUrl, this, this );
+        addToRequestQueue( requestJson, mKey );
+    }
+
+    public void requestNoCache ( int method ) {
+
+        createKey();
+        RequestJson requestJson = new RequestJson( method, mUrl, this, this );
         requestJson.setShouldCache( false );
         addToRequestQueue( requestJson, mKey );
     }
 
-    public void postRequestNoCache(){
+    public void postRequestNoCache () {
+
         createKey();
-        RequestJson requestJson = new RequestJson( Request.Method.POST,mUrl,this,this );
+        RequestJson requestJson = new RequestJson( Request.Method.POST, mUrl, this, this );
         requestJson.setShouldCache( false );
-        addToRequestQueue( requestJson,mKey );
+        addToRequestQueue( requestJson, mKey );
     }
-    public void getRequestNoCache(){
+
+    public void getRequestNoCache () {
+
         createKey();
-        RequestJson requestJson = new RequestJson( Request.Method.GET,mUrl,this,this );
+        RequestJson requestJson = new RequestJson( Request.Method.GET, mUrl, this, this );
         requestJson.setShouldCache( false );
-        addToRequestQueue( requestJson,mKey );
+        addToRequestQueue( requestJson, mKey );
     }
-    public void start(){
+
+    public void start () {
+
         stop();
         mRequestQueue.start();
     }
 
-    public void stop(){
+    public void stop () {
+
         mRequestQueue.stop();
         mRequestQueue.cancelAll( TAG );
     }
+
     private void createKey () {
 
         String key_ext = "";
@@ -149,9 +188,19 @@ public class ConnectWS implements Response.Listener<String>,Response.ErrorListen
         this.mKey = mKey + key_ext;
         this.mDataCache = getCache();
     }
-    private RequestQueue getRequestQueue () {
+
+    private RequestQueue getRequestQueue ( ProgressRequestCallBack progressRequestCallBack ) {
+
         if ( mRequestQueue == null ) {
-            mRequestQueue = Volley.newRequestQueue( mContext.getApplicationContext() );
+            mRequestQueue = VolleyBase.newRequestQueue( mContext.getApplicationContext(), progressRequestCallBack );
+        }
+        return mRequestQueue;
+    }
+
+    private RequestQueue getRequestQueue () {
+
+        if ( mRequestQueue == null ) {
+            mRequestQueue = VolleyBase.newRequestQueue( mContext.getApplicationContext() );
         }
         return mRequestQueue;
     }
@@ -159,13 +208,21 @@ public class ConnectWS implements Response.Listener<String>,Response.ErrorListen
     private < T > void addToRequestQueue ( Request< T > req, String tag ) {
 
         req.setTag( tag );
-        getRequestQueue().add( req );
+        if ( mProgressRequestCallBack != null ){
+            getRequestQueue(mProgressRequestCallBack).add( req );
+        }else {
+            getRequestQueue().add( req );
+        }
     }
 
     private < T > void addToRequestQueue ( Request< T > req ) {
 
         req.setTag( TAG );
-        getRequestQueue().add( req );
+        if ( mProgressRequestCallBack != null ){
+            getRequestQueue(mProgressRequestCallBack).add( req );
+        }else {
+            getRequestQueue().add( req );
+        }
     }
 
     private Object convetString ( String str ) {
@@ -180,6 +237,7 @@ public class ConnectWS implements Response.Listener<String>,Response.ErrorListen
             }
         }
     }
+
     public Object getCache () {
 
         Cache cache = this.getRequestQueue().getCache();
@@ -196,41 +254,42 @@ public class ConnectWS implements Response.Listener<String>,Response.ErrorListen
         }
     }
 
-    public <T> void loadCache(RequestCallBack requestCallBack){
-        createKey();
-        if ( mDataCache !=null ){
-                if ( mDataCache instanceof JSONObject ){
-                    requestCallBack.onResult( Parse.FromJsonToObject( mDataCache.toString(),mObjectParser ) );
-                }else {
-                    if ( mDataCache instanceof JSONArray ){
-                        ArrayList<T> lst = new ArrayList<T>();
-                        lst = Parse.FromJsonArrayToArrayObject(mDataCache.toString(), mObjectParser );
-                        requestCallBack.onResultArray( lst );
-                    }
+    public < T > void loadCache ( RequestCallBack requestCallBack ) {
 
+        createKey();
+        if ( mDataCache != null ) {
+            if ( mDataCache instanceof JSONObject ) {
+                requestCallBack.onResult( Parse.FromJsonToObject( mDataCache.toString(), mObjectParser ) );
+            } else {
+                if ( mDataCache instanceof JSONArray ) {
+                    ArrayList< T > lst = new ArrayList< T >();
+                    lst = Parse.FromJsonArrayToArrayObject( mDataCache.toString(), mObjectParser );
+                    requestCallBack.onResultArray( lst );
                 }
+
+            }
         }
     }
 
     @Override
     public void onErrorResponse ( VolleyError error ) {
 
-        if ( mRequestErrorCallBack != null ){
+        if ( mRequestErrorCallBack != null ) {
             mRequestErrorCallBack.onError( error );
         }
     }
 
     @Override
-    public  void onResponse ( String response ) {
+    public void onResponse ( String response ) {
 
-        if ( mRequestCallBack != null ){
-                if ( convetString( response ) instanceof JSONObject ) {
-                    mRequestCallBack.onResult( Parse.FromJsonToObject( response,mObjectParser ) );
-                }else if ( convetString( response ) instanceof JSONArray ){
-                    ArrayList< Object > lst = new ArrayList<>(  );
-                    lst = Parse.FromJsonArrayToArrayObject( response.toString(), mObjectParser);
-                    mRequestCallBack.onResultArray( lst );
-                }
+        if ( mRequestCallBack != null ) {
+            if ( convetString( response ) instanceof JSONObject ) {
+                mRequestCallBack.onResult( Parse.FromJsonToObject( response, mObjectParser ) );
+            } else if ( convetString( response ) instanceof JSONArray ) {
+                ArrayList< Object > lst = new ArrayList<>();
+                lst = Parse.FromJsonArrayToArrayObject( response.toString(), mObjectParser );
+                mRequestCallBack.onResultArray( lst );
+            }
         }
     }
 
