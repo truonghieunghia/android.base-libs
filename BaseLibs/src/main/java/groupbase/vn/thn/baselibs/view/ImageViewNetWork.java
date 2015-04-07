@@ -15,9 +15,9 @@ import groupbase.vn.thn.baselibs.util.ImageCacheBase;
 /**
  * Created by nghiath on 4/7/15.
  */
-public class ImageViewNetWork extends ImageView{
+public class ImageViewNetWork extends ImageView {
 
-    private  String TAG = "ImageViewNetWork";
+    private String TAG = "ImageViewNetWork";
     private static final int DELAY_LOAD = 10;
     private static final int NO_IMAGE_INVISIBLE = 0;
     private String _mRequestURL = null;
@@ -25,19 +25,23 @@ public class ImageViewNetWork extends ImageView{
     private ImageLoader.ImageListener mListener = null;
     private RequestQueue mQueue = null;
 
-    public ImageViewNetWork(Context context) {
-        super(context);
+    public ImageViewNetWork ( Context context ) {
+
+        super( context );
     }
 
-    public ImageViewNetWork(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    public ImageViewNetWork ( Context context, AttributeSet attrs ) {
+
+        super( context, attrs );
     }
 
     /**
      * requestImage
+     *
      * @param imageURL String
      */
-    public void requestImage( final String imageURL ) {
+    public void requestImage ( final String imageURL ) {
+
         mQueue = Volley.newRequestQueue( getContext() );
         final ImageCacheBase cache = ImageCacheBase.getInstance( getContext() );
         if ( mImageLoader == null ) {
@@ -45,12 +49,13 @@ public class ImageViewNetWork extends ImageView{
             mImageLoader.setBatchedResponseDelay( DELAY_LOAD );
         }
         _mRequestURL = imageURL;
-        setTag(imageURL);
-        mListener = getImageListener( this ,mQueue);
+        setTag( imageURL );
+        mListener = getImageListener( this, mQueue );
         mImageLoader.get( imageURL, mListener );
     }
 
-    public void requestImage( final String imageURL,final int errorImageResId ) {
+    public void requestImage ( final String imageURL, final int errorImageResId ) {
+
         mQueue = Volley.newRequestQueue( getContext() );
         final ImageCacheBase cache = ImageCacheBase.getInstance( getContext() );
         if ( mImageLoader == null ) {
@@ -58,17 +63,19 @@ public class ImageViewNetWork extends ImageView{
             mImageLoader.setBatchedResponseDelay( DELAY_LOAD );
         }
         _mRequestURL = imageURL;
-        setTag(imageURL);
-        mListener = getImageListener( this, errorImageResId ,mQueue);
+        setTag( imageURL );
+        mListener = getImageListener( this, errorImageResId, mQueue );
         mImageLoader.get( imageURL, mListener );
     }
 
-    private static ImageLoader.ImageListener getImageListener ( final ImageView view, final int errorImageResId ,final RequestQueue requestQueue ) {
-        return  new ImageLoader.ImageListener(){
+    private static ImageLoader.ImageListener getImageListener ( final ImageView view, final int errorImageResId, final RequestQueue requestQueue ) {
+
+        return new ImageLoader.ImageListener() {
 
             @Override
-            public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
-                if (response.getBitmap() != null) {
+            public void onResponse ( ImageLoader.ImageContainer response, boolean isImmediate ) {
+
+                if ( response.getBitmap() != null ) {
                     view.setVisibility( View.VISIBLE );
                     view.setImageBitmap( response.getBitmap() );
                 } else {
@@ -79,22 +86,25 @@ public class ImageViewNetWork extends ImageView{
             }
 
             @Override
-            public void onErrorResponse(VolleyError error) {
-                if (errorImageResId != 0) {
+            public void onErrorResponse ( VolleyError error ) {
+
+                if ( errorImageResId != 0 ) {
                     view.setImageResource( errorImageResId );
                 }
                 requestQueue.stop();
                 requestQueue.cancelAll( "ImageViewNetWork" );
             }
-        } ;
+        };
     }
 
-    private static ImageLoader.ImageListener getImageListener ( final ImageView view ,final RequestQueue requestQueue) {
-        return  new ImageLoader.ImageListener(){
+    private static ImageLoader.ImageListener getImageListener ( final ImageView view, final RequestQueue requestQueue ) {
+
+        return new ImageLoader.ImageListener() {
 
             @Override
-            public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
-                if (response.getBitmap() != null) {
+            public void onResponse ( ImageLoader.ImageContainer response, boolean isImmediate ) {
+
+                if ( response.getBitmap() != null ) {
                     view.setVisibility( View.VISIBLE );
                     view.setImageBitmap( response.getBitmap() );
                 } else {
@@ -105,10 +115,11 @@ public class ImageViewNetWork extends ImageView{
             }
 
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onErrorResponse ( VolleyError error ) {
+
                 requestQueue.stop();
                 requestQueue.cancelAll( "ImageViewNetWork" );
             }
-        } ;
+        };
     }
 }
