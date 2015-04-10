@@ -28,7 +28,7 @@ public abstract class FragmentCommon extends Fragment {
     public void onCreate ( Bundle savedInstanceState ) {
 
         super.onCreate( savedInstanceState );
-        mInflater = ( LayoutInflater ) getActivity().getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+        mInflater = LayoutInflater.from( getActivity() );
         mFragmentManager = getActivity().getSupportFragmentManager();
     }
 

@@ -27,8 +27,7 @@ public abstract class ActivityCommon extends FragmentActivity {
     protected void onCreate ( Bundle savedInstanceState ) {
 
         super.onCreate( savedInstanceState );
-        mInflater = (LayoutInflater)getSystemService(
-                Context.LAYOUT_INFLATER_SERVICE);
+        mInflater = LayoutInflater.from (this);
         mFragmentManager = getSupportFragmentManager();
         setContentView( R.layout.common_activity );
         this.init();
