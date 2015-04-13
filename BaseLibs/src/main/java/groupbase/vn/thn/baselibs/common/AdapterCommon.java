@@ -1,5 +1,6 @@
 package groupbase.vn.thn.baselibs.common;
 
+<<<<<<< HEAD
 import android.app.FragmentManager;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,10 +13,17 @@ import java.util.List;
 import java.util.Objects;
 
 import groupbase.vn.thn.baselibs.listener.AdapterBaseListener;
+=======
+import android.content.Context;
+import android.widget.ArrayAdapter;
+
+import java.util.List;
+>>>>>>> 026cf072780b9b484a886813429329da9b93fc58
 
 /**
  * Created by nghiath on 4/3/15.
  */
+<<<<<<< HEAD
 public class AdapterCommon<T> extends ArrayAdapter<T> {
 
     protected FragmentManager mFragmentManager;
@@ -69,5 +77,14 @@ public class AdapterCommon<T> extends ArrayAdapter<T> {
         }
         mAdapterBaseListener.showData(getItem(position),mHolderView,position);
         return view;
+=======
+public class AdapterCommon < T > extends ArrayAdapter< T > {
+
+    private int mXmlLayout;
+    public AdapterCommon ( Context context, int xmlLayout, List< T > list ) {
+
+        super( context, xmlLayout, list );
+        mXmlLayout = xmlLayout;
+>>>>>>> 026cf072780b9b484a886813429329da9b93fc58
     }
 }
