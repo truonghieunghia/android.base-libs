@@ -8,10 +8,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import groupbase.vn.thn.baselibs.listener.AdapterBaseListener;
+import groupbase.vn.thn.baselibs.service.callback.RequestCallBack;
 
 import android.content.Context;
 import android.widget.ArrayAdapter;
@@ -27,7 +29,7 @@ public class AdapterCommon<T> extends ArrayAdapter<T> {
     protected LayoutInflater mInflater;
     private AdapterBaseListener mAdapterBaseListener;
     private int mLayoutId;
-    private Objects mHolderView;
+    private Class<?> mHolderView;
     private List<T> lst;
 
     public AdapterCommon(Context context, int resource, List<T> objects) {
@@ -45,6 +47,8 @@ public class AdapterCommon<T> extends ArrayAdapter<T> {
         lst = objects;
     }
 
+
+
     public <T, H> void setAdapterBaseListener(AdapterBaseListener<T, H> adapterBaseListener) {
         this.mAdapterBaseListener = adapterBaseListener;
 
@@ -60,21 +64,18 @@ public class AdapterCommon<T> extends ArrayAdapter<T> {
         return position;
     }
 
-    public void setTagHolder(Objects holder) {
-        this.mHolderView = holder;
-    }
+
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;
         if (view == null) {
             view = mInflater.inflate(this.mLayoutId, parent, false);
-            mHolderView = (Objects) this.mAdapterBaseListener.setHolderView(view);
-            view.setTag(mHolderView);
+            view.setTag(this.mAdapterBaseListener.setHolderView(view));
+            mAdapterBaseListener.showData(getItem(position), this.mAdapterBaseListener.setHolderView(view), position);
         } else {
-            mHolderView = (Objects) view.getTag();
+            mAdapterBaseListener.showData(getItem(position), view.getTag(), position);
         }
-        mAdapterBaseListener.showData(getItem(position), mHolderView, position);
         return view;
     }
 

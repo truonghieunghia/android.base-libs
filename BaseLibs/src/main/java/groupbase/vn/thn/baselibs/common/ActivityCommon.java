@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public abstract class ActivityCommon extends FragmentActivity {
     protected FragmentManager mFragmentManager;
     protected LayoutInflater mInflater;
     protected FragmentTransaction mFragmentTransaction;
-
+    private FrameLayout window;
     @Override
     protected void onCreate ( Bundle savedInstanceState ) {
 
