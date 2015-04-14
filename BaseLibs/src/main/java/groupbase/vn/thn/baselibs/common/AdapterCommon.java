@@ -6,19 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-
-import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
 import groupbase.vn.thn.baselibs.listener.AdapterBaseListener;
-import groupbase.vn.thn.baselibs.service.callback.RequestCallBack;
 
-import android.content.Context;
-import android.widget.ArrayAdapter;
-
-import java.util.List;
 
 /**
  * Created by nghiath on 4/3/15.
@@ -29,7 +19,6 @@ public class AdapterCommon<T> extends ArrayAdapter<T> {
     protected LayoutInflater mInflater;
     private AdapterBaseListener mAdapterBaseListener;
     private int mLayoutId;
-    private Class<?> mHolderView;
     private List<T> lst;
 
     public AdapterCommon(Context context, int resource, List<T> objects) {
