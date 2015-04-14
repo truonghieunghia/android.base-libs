@@ -9,13 +9,15 @@ import java.lang.annotation.Target;
 /**
  * Created by nghiath on 4/3/15.
  */
-@Target( ElementType.FIELD)
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface JsonAnnotation {
 
-    public String FieldName () default "";
+    public String FieldName() default "";
 
-    public Class< ? > FieldType () default Object.class;
+    public Class<?> FieldType() default Object.class;
 
     public boolean isObject() default false;
+
+    public boolean isList() default false;
 }
