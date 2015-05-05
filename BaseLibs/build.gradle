@@ -23,4 +23,5 @@ dependencies {
     compile project(':base-libs:volley')
     compile files('libs/httpmime-4.3.5.jar')
     compile 'com.android.support:support-v4:21.0.3'
+    compile files('libs/java-json.jar')
 }

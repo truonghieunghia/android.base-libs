@@ -19,6 +19,7 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.XML;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -39,8 +40,16 @@ import groupbase.vn.thn.baselibs.util.Parse;
  */
 public class ConnectWS implements Response.Listener< String >, Response.ErrorListener {
 
+    public int REQUEST_TYPE = 1;
+
+    public interface RequestType{
+        public int XML = 0;
+        public int JSON = 1;
+    }
+
     private String TAG = "ConnectWS";
     private ArrayList< Param > mParams;
+    private ArrayList< Param > mHeaders;
     private String mKey;
     private RequestCallBack mRequestCallBack;
     private RequestErrorCallBack mRequestErrorCallBack;
@@ -75,7 +84,9 @@ public class ConnectWS implements Response.Listener< String >, Response.ErrorLis
         this.mContext = context;
         this.mKey = url;
     }
-
+    public void setRequestType(int requestType){
+        REQUEST_TYPE = requestType;
+    }
     public ConnectWS ( String url, Context context, ProgressRequestCallBack progressRequestCallBack ) {
 
         this.mRequestCallBack = null;
@@ -86,12 +97,17 @@ public class ConnectWS implements Response.Listener< String >, Response.ErrorLis
         this.mProgressRequestCallBack = progressRequestCallBack;
     }
 
+
     public < T > ConnectWS ( String url, RequestCallBack< T > requestCallBack, Context context ) {
 
         this.mContext = context;
         this.mUrl = url;
         this.mKey = url;
         this.setRequestCallBack( requestCallBack );
+    }
+
+    public void setHeader(ArrayList<Param> headers) {
+        this.mHeaders = headers;
     }
 
     public void setProgressRequestCallBack ( ProgressRequestCallBack progressRequestCallBack ) {
@@ -122,46 +138,31 @@ public class ConnectWS implements Response.Listener< String >, Response.ErrorLis
         addToRequestQueue( requestJson, mKey );
     }
 
-    public void postRequest () {
-
-        createKey();
-        RequestJson requestJson = new RequestJson( Request.Method.POST, mUrl, this, this );
-        addToRequestQueue( requestJson, mKey );
-    }
-
     public void onError ( VolleyError volleyError ) {
 
         mRequestErrorCallBack.onError( volleyError );
     }
-
-    public void getRequest () {
-
-        createKey();
-        RequestJson requestJson = new RequestJson( Request.Method.GET, mUrl, this, this );
-        addToRequestQueue( requestJson, mKey );
-    }
-
-    public void requestNoCache ( int method ) {
-
-        createKey();
-        RequestJson requestJson = new RequestJson( method, mUrl, this, this );
-        requestJson.setShouldCache( false );
-        addToRequestQueue( requestJson, mKey );
-    }
-
-    public void postRequestNoCache () {
+    public void postRequest (boolean isCache) {
 
         createKey();
         RequestJson requestJson = new RequestJson( Request.Method.POST, mUrl, this, this );
-        requestJson.setShouldCache( false );
+        requestJson.setShouldCache( isCache );
         addToRequestQueue( requestJson, mKey );
     }
 
-    public void getRequestNoCache () {
+    public void getRequest (boolean isCache) {
 
         createKey();
         RequestJson requestJson = new RequestJson( Request.Method.GET, mUrl, this, this );
-        requestJson.setShouldCache( false );
+        requestJson.setShouldCache( isCache );
+        addToRequestQueue( requestJson, mKey );
+    }
+
+    public void request ( int method ,boolean isCache) {
+
+        createKey();
+        RequestJson requestJson = new RequestJson( method, mUrl, this, this );
+        requestJson.setShouldCache( isCache );
         addToRequestQueue( requestJson, mKey );
     }
 
@@ -258,6 +259,13 @@ public class ConnectWS implements Response.Listener< String >, Response.ErrorLis
 
         createKey();
         if ( mDataCache != null ) {
+            if (REQUEST_TYPE == RequestType.XML){
+                try {
+                    mDataCache = XML.toJSONObject(mDataCache.toString());
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
+            }
             if ( mDataCache instanceof JSONObject ) {
                 requestCallBack.onResult( Parse.FromJsonToObject( mDataCache.toString(), mObjectParser ) );
             } else {
@@ -282,6 +290,14 @@ public class ConnectWS implements Response.Listener< String >, Response.ErrorLis
     @Override
     public void onResponse ( String response ) {
 
+        if (REQUEST_TYPE == RequestType.XML){
+            try {
+                response = XML.toJSONObject(response).toString();
+            }catch (JSONException e){
+                e.printStackTrace();
+            }
+
+        }
         if ( mRequestCallBack != null ) {
             if ( convetString( response ) instanceof JSONObject ) {
                 mRequestCallBack.onResult( Parse.FromJsonToObject( response, mObjectParser ) );
@@ -314,6 +330,18 @@ public class ConnectWS implements Response.Listener< String >, Response.ErrorLis
             return mKey;
         }
 
+        @Override
+        public Map<String, String> getHeaders() throws AuthFailureError {
+            Map< String, String > Headers = new HashMap< String, String >();
+            if ( mHeaders != null && mHeaders.size() > 0 ) {
+                for ( Param param : mHeaders) {
+                    Headers.put( param.getParamName(), param.getParamValue().toString() );
+                }
+            }else {
+                return super.getHeaders();
+            }
+            return Headers;
+        }
 
         @Override
         protected Map< String, String > getParams () throws AuthFailureError {
@@ -323,6 +351,8 @@ public class ConnectWS implements Response.Listener< String >, Response.ErrorLis
                 for ( Param param : mParams ) {
                     Params.put( param.getParamName(), param.getParamValue().toString() );
                 }
+            }else {
+                return  super.getParams();
             }
 
             return Params;
