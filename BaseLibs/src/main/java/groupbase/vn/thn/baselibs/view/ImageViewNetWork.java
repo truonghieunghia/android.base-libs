@@ -20,7 +20,7 @@ public class ImageViewNetWork extends ImageView {
     private String TAG = "ImageViewNetWork";
     private static final int DELAY_LOAD = 10;
     private static final int NO_IMAGE_INVISIBLE = 0;
-    private String _mRequestURL = null;
+    private String mRequestURL = null;
     private ImageLoader mImageLoader = null;
     private ImageLoader.ImageListener mListener = null;
     private RequestQueue mQueue = null;
@@ -48,7 +48,7 @@ public class ImageViewNetWork extends ImageView {
             mImageLoader = new ImageLoader( mQueue, cache );
             mImageLoader.setBatchedResponseDelay( DELAY_LOAD );
         }
-        _mRequestURL = imageURL;
+        mRequestURL = imageURL;
         setTag( imageURL );
         mListener = getImageListener( this, mQueue );
         mImageLoader.get( imageURL, mListener );
@@ -62,7 +62,7 @@ public class ImageViewNetWork extends ImageView {
             mImageLoader = new ImageLoader( mQueue, cache );
             mImageLoader.setBatchedResponseDelay( DELAY_LOAD );
         }
-        _mRequestURL = imageURL;
+        mRequestURL = imageURL;
         setTag( imageURL );
         mListener = getImageListener( this, errorImageResId, mQueue );
         mImageLoader.get( imageURL, mListener );

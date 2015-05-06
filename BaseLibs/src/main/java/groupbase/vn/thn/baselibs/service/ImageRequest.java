@@ -21,9 +21,9 @@ public class ImageRequest {
     /**
      * Constructor
      */
-    public ImageRequest(final Context aContext) {
+    public ImageRequest(final Context context) {
 
-        mContext = aContext;
+        mContext = context;
         mCache = DiskImageCacheBase.getInstance(mContext);
     }
 
@@ -31,9 +31,9 @@ public class ImageRequest {
      * Request images
      *
      * @param aUrl url that get image
-     * @param aListener WidgetImageRequestListener
+     * @param listener WidgetImageRequestListener
      */
-    public void request(final String aUrl, final ImageRequestListener aListener) {
+    public void request(final String aUrl, final ImageRequestListener listener) {
 
         // If have cache, run response in cache of bitmap
 
@@ -41,7 +41,7 @@ public class ImageRequest {
 
         if (bitmap != null) {
 
-            aListener.onComplete(bitmap);
+            listener.onComplete(bitmap);
             return;
         }
 
@@ -54,28 +54,28 @@ public class ImageRequest {
         imageLoader.get(aUrl, new ImageLoader.ImageListener() {
 
             @Override
-            public void onResponse(final ImageLoader.ImageContainer aResponse, final boolean aIsImmediate) {
+            public void onResponse(final ImageLoader.ImageContainer response, final boolean isImmediate) {
 
-                if (aResponse != null && aResponse.getBitmap() != null) {
+                if (response != null && response.getBitmap() != null) {
 
                     queue.stop();
-                    mCache.putBitmap(aResponse.getRequestUrl(), aResponse.getBitmap());
+                    mCache.putBitmap(response.getRequestUrl(), response.getBitmap());
 
-                    if (aListener != null) {
+                    if (listener != null) {
 
-                        aListener.onComplete(aResponse.getBitmap());
+                        listener.onComplete(response.getBitmap());
                     }
                 }
             }
 
             @Override
-            public void onErrorResponse(final VolleyError aError) {
+            public void onErrorResponse(final VolleyError error) {
 
                 queue.stop();
 
-                if (aListener != null) {
+                if (listener != null) {
 
-                    aListener.onError(aError);
+                    listener.onError(error);
                 }
             }
         });
