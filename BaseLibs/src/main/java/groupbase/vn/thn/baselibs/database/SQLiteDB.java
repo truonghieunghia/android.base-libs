@@ -18,7 +18,7 @@ public class SQLiteDB {
         this.mDatabase = database;
     }
 
-    public void close() {
+    public synchronized void close() {
         if (mOpenCounter.decrementAndGet() == 0) {
             // Closing database
             mDatabase.close();
