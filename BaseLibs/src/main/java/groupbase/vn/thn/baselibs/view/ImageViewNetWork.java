@@ -81,8 +81,8 @@ public class ImageViewNetWork extends ImageView {
                 } else {
                     view.setVisibility( View.INVISIBLE );
                 }
-                requestQueue.stop();
-                requestQueue.cancelAll( "ImageViewNetWork" );
+//                requestQueue.stop();
+//                requestQueue.cancelAll( "ImageViewNetWork" );
             }
 
             @Override
@@ -91,8 +91,8 @@ public class ImageViewNetWork extends ImageView {
                 if ( errorImageResId != 0 ) {
                     view.setImageResource( errorImageResId );
                 }
-                requestQueue.stop();
-                requestQueue.cancelAll( "ImageViewNetWork" );
+//                requestQueue.stop();
+//                requestQueue.cancelAll( "ImageViewNetWork" );
             }
         };
     }
@@ -110,15 +110,15 @@ public class ImageViewNetWork extends ImageView {
                 } else {
                     view.setVisibility( View.INVISIBLE );
                 }
-                requestQueue.stop();
-                requestQueue.cancelAll( "ImageViewNetWork" );
+//                requestQueue.stop();
+//                requestQueue.cancelAll( "ImageViewNetWork" );
             }
 
             @Override
             public void onErrorResponse ( VolleyError error ) {
 
-                requestQueue.stop();
-                requestQueue.cancelAll( "ImageViewNetWork" );
+//                requestQueue.stop();
+//                requestQueue.cancelAll( "ImageViewNetWork" );
             }
         };
     }
