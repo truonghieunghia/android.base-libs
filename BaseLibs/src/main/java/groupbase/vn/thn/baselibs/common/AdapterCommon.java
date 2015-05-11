@@ -54,6 +54,18 @@ public class AdapterCommon<T> extends ArrayAdapter<T> {
     }
 
 
+    @Override
+    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+        View view = convertView;
+        if (view == null) {
+            view = mInflater.inflate(this.mLayoutId, parent, false);
+            view.setTag(this.mAdapterBaseListener.setHolderView(view));
+            mAdapterBaseListener.showData(getItem(position), this.mAdapterBaseListener.setHolderView(view), position);
+        } else {
+            mAdapterBaseListener.showData(getItem(position), view.getTag(), position);
+        }
+        return view;
+    }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
