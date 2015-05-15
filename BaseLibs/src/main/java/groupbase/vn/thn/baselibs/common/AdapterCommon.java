@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import java.util.List;
 import groupbase.vn.thn.baselibs.listener.AdapterBaseListener;
+import groupbase.vn.thn.baselibs.listener.AdapterDropDownBaseListener;
 
 
 /**
@@ -18,6 +19,8 @@ public class AdapterCommon<T> extends ArrayAdapter<T> {
     protected FragmentManager mFragmentManager;
     protected LayoutInflater mInflater;
     private AdapterBaseListener mAdapterBaseListener;
+    private AdapterDropDownBaseListener mAdapterDropDownBaseListener;
+    private int mLayoutDropDownId;
     private int mLayoutId;
     private List<T> lst;
 
@@ -36,13 +39,20 @@ public class AdapterCommon<T> extends ArrayAdapter<T> {
         lst = objects;
     }
 
-
+    @Override
+    public void setDropDownViewResource(int resource) {
+        super.setDropDownViewResource(resource);
+        mLayoutDropDownId = resource;
+    }
 
     public <T, H> void setAdapterBaseListener(AdapterBaseListener<T, H> adapterBaseListener) {
         this.mAdapterBaseListener = adapterBaseListener;
 
     }
+    public <T, H> void setAdapterDropDownBaseListener(AdapterDropDownBaseListener<T, H> adapterBaseDropDownListener) {
+        this.mAdapterDropDownBaseListener = adapterBaseDropDownListener;
 
+    }
     @Override
     public int getCount() {
         return lst.size();
@@ -56,15 +66,19 @@ public class AdapterCommon<T> extends ArrayAdapter<T> {
 
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
-        View view = convertView;
-        if (view == null) {
-            view = mInflater.inflate(this.mLayoutId, parent, false);
-            view.setTag(this.mAdapterBaseListener.setHolderView(view));
-            mAdapterBaseListener.showData(getItem(position), this.mAdapterBaseListener.setHolderView(view), position);
-        } else {
-            mAdapterBaseListener.showData(getItem(position), view.getTag(), position);
+        if (mAdapterDropDownBaseListener !=null) {
+            View view = convertView;
+            if (view == null) {
+                view = mInflater.inflate(this.mLayoutDropDownId, parent, false);
+                view.setTag(this.mAdapterBaseListener.setHolderView(view));
+                mAdapterDropDownBaseListener.showData(getItem(position), this.mAdapterDropDownBaseListener.setHolderView(view), position);
+            } else {
+                mAdapterDropDownBaseListener.showData(getItem(position), view.getTag(), position);
+            }
+            return view;
+        }else {
+            return super.getDropDownView(position,convertView,parent);
         }
-        return view;
     }
 
     @Override
