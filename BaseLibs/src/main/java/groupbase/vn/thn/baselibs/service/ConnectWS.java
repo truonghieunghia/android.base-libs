@@ -32,6 +32,7 @@ import java.util.Map;
 import groupbase.vn.thn.baselibs.service.callback.ProgressRequestCallBack;
 import groupbase.vn.thn.baselibs.service.callback.RequestCallBack;
 import groupbase.vn.thn.baselibs.service.callback.RequestErrorCallBack;
+import groupbase.vn.thn.baselibs.service.callback.UIRequestCallBack;
 import groupbase.vn.thn.baselibs.util.Param;
 import groupbase.vn.thn.baselibs.util.Parse;
 
@@ -61,13 +62,18 @@ public class ConnectWS implements Response.Listener< String >, Response.ErrorLis
     private ArrayList< ? > mListResult;
     private static ConnectWS mInstance;
     private ProgressRequestCallBack mProgressRequestCallBack;
+    private UIRequestCallBack mUIRequestCallBack;
 
     public ConnectWS ( Context context ) {
 
         this.mContext = context;
         mRequestQueue = getRequestQueue();
     }
+    public ConnectWS ( Context context ,ProgressRequestCallBack progressRequestCallBack ) {
 
+        this.mContext = context;
+        mRequestQueue = getRequestQueue();
+    }
     public static synchronized ConnectWS getInstance ( Context context ) {
 
         if ( mInstance == null ) {
@@ -84,6 +90,11 @@ public class ConnectWS implements Response.Listener< String >, Response.ErrorLis
         this.mContext = context;
         this.mKey = url;
     }
+
+    public void setUIRequestCallBack(UIRequestCallBack uiRequestCallBack){
+        mUIRequestCallBack = uiRequestCallBack;
+    }
+
     public void setRequestType(int requestType){
         REQUEST_TYPE = requestType;
     }
@@ -135,35 +146,44 @@ public class ConnectWS implements Response.Listener< String >, Response.ErrorLis
 
         createKey();
         RequestJson requestJson = new RequestJson( method, mUrl, this, this );
-        addToRequestQueue( requestJson, mKey );
+        addToRequestQueue(requestJson, mKey);
     }
 
     public void onError ( VolleyError volleyError ) {
 
-        mRequestErrorCallBack.onError( volleyError );
+        mRequestErrorCallBack.onError(volleyError);
+        if (mUIRequestCallBack != null){
+            mUIRequestCallBack.end();
+        }
     }
     public void postRequest (boolean isCache) {
 
-        createKey();
-        RequestJson requestJson = new RequestJson( Request.Method.POST, mUrl, this, this );
-        requestJson.setShouldCache( isCache );
-        addToRequestQueue( requestJson, mKey );
+        request(Request.Method.POST, isCache);
     }
 
     public void getRequest (boolean isCache) {
 
-        createKey();
-        RequestJson requestJson = new RequestJson( Request.Method.GET, mUrl, this, this );
-        requestJson.setShouldCache( isCache );
-        addToRequestQueue( requestJson, mKey );
+        request(Request.Method.GET, isCache);
     }
 
     public void request ( int method ,boolean isCache) {
+        if (mUIRequestCallBack != null){
+            mUIRequestCallBack.begin();
+        }
+        if (method == Request.Method.GET ){
+            for (int i = 0 ;i< mParams.size();i++){
+                if (i == 0){
+                    mUrl = mUrl+"?"+mParams.get(i).getParamName()+"="+mParams.get(i).getParamValue();
+                }else {
+                    mUrl = mUrl+"&"+mParams.get(i).getParamName()+"="+mParams.get(i).getParamValue();
+                }
+            }
 
+        }
         createKey();
         RequestJson requestJson = new RequestJson( method, mUrl, this, this );
-        requestJson.setShouldCache( isCache );
-        addToRequestQueue( requestJson, mKey );
+        requestJson.setShouldCache(isCache);
+        addToRequestQueue(requestJson, mKey);
     }
 
     public void start () {
@@ -201,7 +221,11 @@ public class ConnectWS implements Response.Listener< String >, Response.ErrorLis
     private RequestQueue getRequestQueue () {
 
         if ( mRequestQueue == null ) {
-            mRequestQueue = VolleyBase.newRequestQueue( mContext.getApplicationContext() );
+            if (mProgressRequestCallBack != null){
+                mRequestQueue = VolleyBase.newRequestQueue( mContext.getApplicationContext(), mProgressRequestCallBack );
+            }else {
+                mRequestQueue = VolleyBase.newRequestQueue(mContext.getApplicationContext());
+            }
         }
         return mRequestQueue;
     }
@@ -306,6 +330,9 @@ public class ConnectWS implements Response.Listener< String >, Response.ErrorLis
                 lst = Parse.FromJsonArrayToArrayObject( response.toString(), mObjectParser );
                 mRequestCallBack.onResultArray( lst );
             }
+        }
+        if (mUIRequestCallBack != null){
+            mUIRequestCallBack.end();
         }
     }
 

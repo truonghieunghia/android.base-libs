@@ -60,6 +60,7 @@ public class NetworkBase implements Network {
         mHttpStack = httpStack;
         mPool = new ByteArrayPool( DEFAULT_POOL_SIZE );
         mProgressRequestCallBack = progressRequestCallBack;
+
     }
 
     public NetworkBase ( HttpStack httpStack ) {
@@ -231,12 +232,18 @@ public class NetworkBase implements Network {
             return bytes.toByteArray();
         } finally {
             try {
+                if ( mProgressRequestCallBack != null ) {
+                    mProgressRequestCallBack.onComplete( bytes.size() );
+                }
                 // Close the InputStream and release the resources by "consuming the content".
                 entity.consumeContent();
             } catch ( IOException e ) {
                 // This can happen if there was an exception above that left the entity in
                 // an invalid state.
                 VolleyLog.v( "Error occured when calling consumingContent" );
+                if ( mProgressRequestCallBack != null ) {
+                    mProgressRequestCallBack.onComplete( bytes.size() );
+                }
             }
             mPool.returnBuf( buffer );
             bytes.close();
