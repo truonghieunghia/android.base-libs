@@ -28,24 +28,28 @@ public class Parse {
                 JsonAnnotation jsonAnnotation = field.getAnnotation(JsonAnnotation.class);
                 if (jsonAnnotation != null) {
                     try {
-                        Object valueJson = jsonObject.get(jsonAnnotation.FieldName());
-                        if (valueJson != null) {
-                            if (valueJson instanceof JSONObject) {
-                                if (jsonAnnotation.isObject()) {
-                                    field.set(result, FromJsonToObject(valueJson.toString(), jsonAnnotation.FieldType()));
-                                }
-                            } else {
-                                if (valueJson instanceof JSONArray) {
+
+                        if (jsonObject.has(jsonAnnotation.FieldName())){
+                            Object valueJson = jsonObject.get(jsonAnnotation.FieldName());
+                            if (valueJson != null) {
+                                if (valueJson instanceof JSONObject) {
                                     if (jsonAnnotation.isObject()) {
-                                        field.set(result, FromJsonArrayToArrayObject(valueJson.toString(), jsonAnnotation.FieldType()));
+                                        field.set(result, FromJsonToObject(valueJson.toString(), jsonAnnotation.FieldType()));
                                     }
                                 } else {
-                                    field.set(result, jsonAnnotation.FieldType().cast(valueJson));
+                                    if (valueJson instanceof JSONArray) {
+                                        if (jsonAnnotation.isObject()) {
+                                            field.set(result, FromJsonArrayToArrayObject(valueJson.toString(), jsonAnnotation.FieldType()));
+                                        }
+                                    } else {
+                                        field.set(result, jsonAnnotation.FieldType().cast(valueJson));
+                                    }
                                 }
+                            } else {
+                                field.set(result, null);
                             }
-                        } else {
-                            field.set(result, null);
                         }
+
                     } catch (JSONException e) {
                         Log.e("JsonParse",jsonAnnotation.FieldName()+": "+ e.getMessage());
                     } catch (Exception e) {
