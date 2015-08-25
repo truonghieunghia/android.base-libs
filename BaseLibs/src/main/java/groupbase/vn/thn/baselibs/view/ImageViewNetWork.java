@@ -40,9 +40,9 @@ public class ImageViewNetWork extends ImageView {
      *
      * @param imageURL String
      */
-    public void requestImage ( final String imageURL ) {
+    public void requestImage ( final String imageURL ,RequestQueue requestQueue) {
 
-        mQueue = Volley.newRequestQueue( getContext() );
+        mQueue = requestQueue;
         final ImageCacheBase cache = ImageCacheBase.getInstance( getContext() );
         if ( mImageLoader == null ) {
             mImageLoader = new ImageLoader( mQueue, cache );
@@ -54,9 +54,9 @@ public class ImageViewNetWork extends ImageView {
         mImageLoader.get( imageURL, mListener );
     }
 
-    public void requestImage ( final String imageURL, final int errorImageResId ) {
+    public void requestImage ( final String imageURL, final int errorImageResId,RequestQueue requestQueue ) {
 
-        mQueue = Volley.newRequestQueue( getContext() );
+        mQueue = requestQueue;
         final ImageCacheBase cache = ImageCacheBase.getInstance( getContext() );
         if ( mImageLoader == null ) {
             mImageLoader = new ImageLoader( mQueue, cache );

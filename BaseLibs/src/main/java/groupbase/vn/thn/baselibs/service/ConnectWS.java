@@ -25,9 +25,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import groupbase.vn.thn.baselibs.service.callback.ProgressRequestCallBack;
 import groupbase.vn.thn.baselibs.service.callback.RequestCallBack;
@@ -95,6 +97,13 @@ public class ConnectWS implements Response.Listener< String >, Response.ErrorLis
         mUIRequestCallBack = uiRequestCallBack;
     }
 
+    public void setUrl(String url){
+        this.mUrl = url;
+        this.mKey = url;
+    }
+//    public RequestQueue getRequestQueue(){
+//        return mRequestQueue;
+//    }
     public void setRequestType(int requestType){
         REQUEST_TYPE = requestType;
     }
@@ -134,6 +143,7 @@ public class ConnectWS implements Response.Listener< String >, Response.ErrorLis
     public < T > void setRequestCallBack ( RequestCallBack< T > requestCallBack ) {
 
         this.mObjectParser = ( Class< T > ) (( ParameterizedType ) requestCallBack.getClass().getGenericInterfaces()[ 0 ]).getActualTypeArguments()[ 0 ];
+
         this.mRequestCallBack = requestCallBack;
     }
 
@@ -170,18 +180,19 @@ public class ConnectWS implements Response.Listener< String >, Response.ErrorLis
         if (mUIRequestCallBack != null){
             mUIRequestCallBack.begin();
         }
+        String url =mUrl;
         if (method == Request.Method.GET ){
             for (int i = 0 ;i< mParams.size();i++){
                 if (i == 0){
-                    mUrl = mUrl+"?"+mParams.get(i).getParamName()+"="+mParams.get(i).getParamValue();
+                    url = url+"?"+mParams.get(i).getParamName()+"="+mParams.get(i).getParamValue();
                 }else {
-                    mUrl = mUrl+"&"+mParams.get(i).getParamName()+"="+mParams.get(i).getParamValue();
+                    url = url+"&"+mParams.get(i).getParamName()+"="+mParams.get(i).getParamValue();
                 }
             }
 
         }
         createKey();
-        RequestJson requestJson = new RequestJson( method, mUrl, this, this );
+        RequestJson requestJson = new RequestJson( method, url, this, this );
         requestJson.setShouldCache(isCache);
         addToRequestQueue(requestJson, mKey);
     }
@@ -218,7 +229,7 @@ public class ConnectWS implements Response.Listener< String >, Response.ErrorLis
         return mRequestQueue;
     }
 
-    private RequestQueue getRequestQueue () {
+    public RequestQueue getRequestQueue () {
 
         if ( mRequestQueue == null ) {
             if (mProgressRequestCallBack != null){
